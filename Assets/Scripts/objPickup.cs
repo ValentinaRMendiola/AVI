@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class objPickup : MonoBehaviour
@@ -22,46 +20,65 @@ public class objPickup : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("MainCamera"))
+        if (other.CompareTag("MainCamera") && !pickedup)
         {
-            if(pickedup == false)
-            {
-                crosshair1.SetActive(true);
-                crosshair2.SetActive(false);
-                interactable = false;
-            }
+            crosshair1.SetActive(true);
+            crosshair2.SetActive(false);
+            interactable = false;
         }
     }
 
     void Update()
     {
-        if (interactable == true)
+        if (!interactable) return;
+
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                objTransform.parent = cameraTrans;
-                objRigidbody.useGravity = false;
-                pickedup = true;
-            }
+            PickUp();
+        }
 
-            if (Input.GetMouseButtonUp(0))
-            {
-                objTransform.parent = null;
-                objRigidbody.useGravity = true;
-                pickedup = false;
-            }
+        if (Input.GetMouseButtonUp(0))
+        {
+            Drop();
+        }
 
-            if (pickedup == true)
-            {
-                if (Input.GetMouseButtonDown(1))
-                {
-                    objTransform.parent = null;
-                    objRigidbody.useGravity = true;
-                    objRigidbody.velocity = cameraTrans.forward * throwAmount * Time.deltaTime;
-                    pickedup = false;
-                }
-            }
+        if (pickedup && Input.GetMouseButtonDown(1))
+        {
+            Throw();
         }
     }
 
+    void PickUp()
+    {
+        objTransform.parent = cameraTrans;
+
+        objRigidbody.isKinematic = true;
+        objRigidbody.useGravity = false;
+        objRigidbody.velocity = Vector3.zero;
+        objRigidbody.angularVelocity = Vector3.zero;
+
+        pickedup = true;
+    }
+
+    void Drop()
+    {
+        objTransform.parent = null;
+
+        objRigidbody.isKinematic = false;
+        objRigidbody.useGravity = true;
+
+        pickedup = false;
+    }
+
+    void Throw()
+    {
+        objTransform.parent = null;
+
+        objRigidbody.isKinematic = false;
+        objRigidbody.useGravity = true;
+
+        objRigidbody.velocity = cameraTrans.forward * throwAmount;
+
+        pickedup = false;
+    }
 }
