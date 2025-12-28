@@ -18608,6 +18608,22 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2295474945879133804, guid: 6e57778098b38134dace6aa846a36c44, type: 3}
+      propertyPath: m_Radius
+      value: 0.5300236
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295474945879133804, guid: 6e57778098b38134dace6aa846a36c44, type: 3}
+      propertyPath: m_Center.x
+      value: 7.3614986e-12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295474945879133804, guid: 6e57778098b38134dace6aa846a36c44, type: 3}
+      propertyPath: m_Center.y
+      value: 0.21526623
+      objectReference: {fileID: 0}
+    - target: {fileID: 2295474945879133804, guid: 6e57778098b38134dace6aa846a36c44, type: 3}
+      propertyPath: m_Center.z
+      value: -0.0010110141
+      objectReference: {fileID: 0}
     - target: {fileID: 4957506857276398166, guid: 6e57778098b38134dace6aa846a36c44, type: 3}
       propertyPath: m_TagString
       value: Player
