@@ -32,6 +32,7 @@ namespace Convai.Scripts.Runtime.Features
     [AddComponentMenu("Convai/Convai Actions Handler")]
     public class ConvaiActionsHandler : MonoBehaviour
     {
+        [SerializeField] private Transform playerTransform;
         [SerializeField] public ActionMethod[] actionMethods;
         public List<string> actionResponseList = new();
         private readonly List<ConvaiAction> _actionList = new();
@@ -101,6 +102,8 @@ namespace Convai.Scripts.Runtime.Features
                 new() { action = "Move To", actionChoice = ActionChoice.MoveTo },
                 new() { action = "Follow", actionChoice = ActionChoice.Follow },
                 new() { action = "Stop Follow", actionChoice = ActionChoice.StopFollow },
+                new() { action = "Stop", actionChoice = ActionChoice.StopFollow }, //Alias for StopFollow
+                new() { action = "stop", actionChoice = ActionChoice.StopFollow }, //Alias for StopFollow
                 new() { action = "Pick Up", actionChoice = ActionChoice.PickUp },
                 new() { action = "Dance", animationName = "Dance", actionChoice = ActionChoice.None },
                 new() { action = "Drop", actionChoice = ActionChoice.Drop },
@@ -327,11 +330,11 @@ namespace Convai.Scripts.Runtime.Features
                     break;
 
                 case ActionChoice.Follow:
-                    _followCoroutine = StartCoroutine(FollowTarget(action.Target));
+                    yield return FollowAction();
                     break;
 
                 case ActionChoice.StopFollow:
-                    StopFollowing();
+                    yield return StopFollowAction();
                     break;
 
                 case ActionChoice.PickUp:
@@ -541,55 +544,7 @@ namespace Convai.Scripts.Runtime.Features
         }
 
         // STEP 3: Add the function for your action here.
-        private IEnumerator FollowTarget(GameObject target)
-        {
-            if (!IsTargetValid(target)) yield break;
-
-            ActionStarted?.Invoke("Follow", target);
-
-            NavMeshAgent agent = _currentNPC.GetComponent<NavMeshAgent>();
-            Animator animator = _currentNPC.GetComponent<Animator>();
-
-            animator.CrossFade(Animator.StringToHash("Walking"), 0.1f);
-            agent.updateRotation = false;
-
-            while (target != null && target.activeInHierarchy)
-            {
-                agent.SetDestination(target.transform.position);
-
-                if (agent.velocity.sqrMagnitude > 0.1f)
-                {
-                    Quaternion rotation = Quaternion.LookRotation(agent.velocity.normalized);
-                    rotation.x = 0;
-                    rotation.z = 0;
-                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 5f * Time.deltaTime);
-                }
-
-                yield return null;
-            }
-
-            animator.CrossFade(Animator.StringToHash("Idle"), 0.1f);
-            ActionEnded?.Invoke("Follow", target);
-        }
-
-        private void StopFollowing()
-        {
-            if (_followCoroutine != null)
-            {
-                StopCoroutine(_followCoroutine);
-                _followCoroutine = null;
-            }
-
-            if (_agent != null)
-            {
-                _agent.ResetPath();
-            }
-
-            Animator animator = _currentNPC.GetComponent<Animator>();
-            animator.CrossFade(Animator.StringToHash("Idle"), 0.1f);
-
-            ActionEnded?.Invoke("Follow", _currentNPC.gameObject);
-        }
+        
 
         #region Action Implementation Methods
 
@@ -847,6 +802,24 @@ namespace Convai.Scripts.Runtime.Features
         }
 
         // STEP 3: Add the function for your action here.
+        private IEnumerator FollowAction()
+        {
+            Debug.Log("Follow Action Ejecutado");
+            NPCFollower follower = GetComponent<NPCFollower>();
+            if (playerTransform != null)
+                follower.StartFollowing(playerTransform);
+            yield break;
+        }
+
+
+
+        private IEnumerator StopFollowAction()
+        {
+            Debug.Log("Stop Follow Action Ejecutado");
+            NPCFollower follower = GetComponent<NPCFollower>();
+            follower.StopFollowing();
+            yield break;
+        }
 
         #endregion
     }
