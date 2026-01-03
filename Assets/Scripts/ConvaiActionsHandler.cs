@@ -19,7 +19,9 @@ namespace Convai.Scripts.Runtime.Features
         Crouch,
         MoveTo,
         PickUp,
-        Drop
+        Drop,
+        Follow,
+        StopFollow
     }
 
     /// <summary>
@@ -39,9 +41,14 @@ namespace Convai.Scripts.Runtime.Features
         private ConvaiInteractablesData _interactablesData;
         private Coroutine _playActionListCoroutine;
 
+        private Coroutine _followCoroutine;
+        private NavMeshAgent _agent;
+
         // Awake is called when the script instance is being loaded
         private void Awake()
         {
+            _agent = GetComponent<NavMeshAgent>();
+
             // Find the global action settings object in the scene
             _interactablesData = FindObjectOfType<ConvaiInteractablesData>();
 
@@ -92,6 +99,8 @@ namespace Convai.Scripts.Runtime.Features
             actionMethods = new ActionMethod[]
             {
                 new() { action = "Move To", actionChoice = ActionChoice.MoveTo },
+                new() { action = "Follow", actionChoice = ActionChoice.Follow },
+                new() { action = "Stop Follow", actionChoice = ActionChoice.StopFollow },
                 new() { action = "Pick Up", actionChoice = ActionChoice.PickUp },
                 new() { action = "Dance", animationName = "Dance", actionChoice = ActionChoice.None },
                 new() { action = "Drop", actionChoice = ActionChoice.Drop },
@@ -317,6 +326,14 @@ namespace Convai.Scripts.Runtime.Features
                     yield return MoveTo(action.Target);
                     break;
 
+                case ActionChoice.Follow:
+                    _followCoroutine = StartCoroutine(FollowTarget(action.Target));
+                    break;
+
+                case ActionChoice.StopFollow:
+                    StopFollowing();
+                    break;
+
                 case ActionChoice.PickUp:
                     // Call the PickUp function and yield until it's completed
                     yield return PickUp(action.Target);
@@ -524,6 +541,55 @@ namespace Convai.Scripts.Runtime.Features
         }
 
         // STEP 3: Add the function for your action here.
+        private IEnumerator FollowTarget(GameObject target)
+        {
+            if (!IsTargetValid(target)) yield break;
+
+            ActionStarted?.Invoke("Follow", target);
+
+            NavMeshAgent agent = _currentNPC.GetComponent<NavMeshAgent>();
+            Animator animator = _currentNPC.GetComponent<Animator>();
+
+            animator.CrossFade(Animator.StringToHash("Walking"), 0.1f);
+            agent.updateRotation = false;
+
+            while (target != null && target.activeInHierarchy)
+            {
+                agent.SetDestination(target.transform.position);
+
+                if (agent.velocity.sqrMagnitude > 0.1f)
+                {
+                    Quaternion rotation = Quaternion.LookRotation(agent.velocity.normalized);
+                    rotation.x = 0;
+                    rotation.z = 0;
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 5f * Time.deltaTime);
+                }
+
+                yield return null;
+            }
+
+            animator.CrossFade(Animator.StringToHash("Idle"), 0.1f);
+            ActionEnded?.Invoke("Follow", target);
+        }
+
+        private void StopFollowing()
+        {
+            if (_followCoroutine != null)
+            {
+                StopCoroutine(_followCoroutine);
+                _followCoroutine = null;
+            }
+
+            if (_agent != null)
+            {
+                _agent.ResetPath();
+            }
+
+            Animator animator = _currentNPC.GetComponent<Animator>();
+            animator.CrossFade(Animator.StringToHash("Idle"), 0.1f);
+
+            ActionEnded?.Invoke("Follow", _currentNPC.gameObject);
+        }
 
         #region Action Implementation Methods
 
