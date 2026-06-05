@@ -2,172 +2,77 @@ using UnityEngine;
 
 public class objPickup : MonoBehaviour
 {
-    public GameObject crosshair1, crosshair2;
-    public Transform objTransform, cameraTrans;
-    public bool interactable, pickedup;
+    [HideInInspector]
+    public bool pickedup;
 
     [Header("Seed Settings")]
+
     public bool isSeed;
-    public Collider seedPhysicsCollider; // EL COLLIDER PEQUEÑO (MESH)
-    public bool isPlanted;                 // 
-    public Collider pickupTriggerCollider;
+
+    public bool isPlanted;
+
+    public Collider seedPhysicsCollider;
+
     public Rigidbody objRigidbody;
-    public float throwAmount;
+
+    public float throwAmount = 8;
 
     [Header("Seed Duplication")]
-    public bool isSeedSource;        // SOLO el objeto fuente
-    public int maxSeeds = 5;         // máximo permitido
+
+    public bool isSeedSource;
+
+    public int maxSeeds = 5;
+
     private int currentSeeds = 1;
 
-    private void OnValidate()
+    public void PickUp()
     {
-        if (!isSeed)
-        {
-            if (seedPhysicsCollider != null)
-                seedPhysicsCollider.enabled = false;
-            return;
-        }
-
-        if (seedPhysicsCollider != null)
-            seedPhysicsCollider.enabled = true;
-    }
-
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (isPlanted) return;
-
-        if (other.CompareTag("MainCamera"))
-        {
-            crosshair1.SetActive(false);
-            crosshair2.SetActive(true);
-            interactable = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("MainCamera") && !pickedup)
-        {
-            crosshair1.SetActive(true);
-            crosshair2.SetActive(false);
-            interactable = false;
-        }
-    }
-
-    void Update()
-    {
-        if (isPlanted) return;
-
-        // SI YA ESTÁ TOMADO permitir soltar
-        if (pickedup)
-        {
-            if (Input.GetMouseButtonUp(0))
-                Drop();
-
-            if (Input.GetMouseButtonDown(1))
-                Throw();
-
-            return;
-        }
-
-        // SOLO PARA INTENTAR TOMAR
-        if (!interactable) return;
-
-        if (Input.GetMouseButtonDown(0))
-            PickUp();
-    }
-
-    void PickUp()
-    {
-        // DUPLICAR SOLO SI ES FUENTE
-        if (isSeed && isSeedSource)
-        {
-            if (currentSeeds < maxSeeds)
-            {
-                objPickup newSeed = DuplicateSeed();
-                newSeed.PickUpDirect(cameraTrans);
-            }
-            return; // NUNCA se toma la fuente
-        }
-        PickUpDirect(cameraTrans);
-    }
-
-    void PickUpDirect(Transform parent)
-    {
-        // SOLO semillas usan su collider especial
-        if (isSeed && seedPhysicsCollider != null)
-            seedPhysicsCollider.enabled = false;
-
-        if (pickupTriggerCollider != null)
-            pickupTriggerCollider.enabled = false;
-
-        objTransform.parent = parent;
-
-        objRigidbody.isKinematic = true;
-        objRigidbody.useGravity = false;
-        objRigidbody.velocity = Vector3.zero;
-        objRigidbody.angularVelocity = Vector3.zero;
-
         pickedup = true;
+
+        objRigidbody.useGravity = false;
+
+        objRigidbody.drag = 10f;
     }
 
-
-    void Drop()
+    public void Drop()
     {
-        objTransform.parent = null;
+        pickedup = false;
 
-        objRigidbody.isKinematic = false;
         objRigidbody.useGravity = true;
 
-        if (isSeed && seedPhysicsCollider != null)
-            seedPhysicsCollider.enabled = true;
-
-        if (pickupTriggerCollider != null)
-            pickupTriggerCollider.enabled = true;
-
-        pickedup = false;
+        objRigidbody.drag = 0f;
     }
 
-    void Throw()
+    public void Throw(Vector3 dir)
     {
-        objTransform.parent = null;
+        Drop();
 
-        objRigidbody.isKinematic = false;
-        objRigidbody.useGravity = true;
-
-        objRigidbody.velocity = cameraTrans.forward * throwAmount;
-
-        pickedup = false;
+        objRigidbody.velocity = dir * throwAmount;
     }
 
-    objPickup DuplicateSeed()
+    public objPickup CreateSeedCopy()
     {
-        GameObject newSeed = Instantiate(
+        GameObject clone = Instantiate(
             gameObject,
-            transform.position + transform.forward * 0.15f,
+            transform.position,
             transform.rotation
         );
 
-        objPickup seedScript = newSeed.GetComponent<objPickup>();
-        Rigidbody rb = newSeed.GetComponent<Rigidbody>();
+        objPickup seed = clone.GetComponent<objPickup>();
 
-        seedScript.isSeedSource = false;
+        seed.isSeedSource = false;
 
-        seedScript.currentSeeds = currentSeeds + 1;
         currentSeeds++;
 
-        seedScript.isPlanted = false;
-        seedScript.pickedup = false;
-        seedScript.interactable = false;
+        seed.currentSeeds = currentSeeds;
 
-        rb.isKinematic = true;
-        rb.useGravity = false;
-
-        seedScript.seedPhysicsCollider.enabled = false;
-        seedScript.pickupTriggerCollider.enabled = false;
-
-        return seedScript;
+        return seed;
     }
 
+    public bool CanCreateSeed()
+    {
+        return isSeed &&
+               isSeedSource &&
+               currentSeeds < maxSeeds;
+    }
 }

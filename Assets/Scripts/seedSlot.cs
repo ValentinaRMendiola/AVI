@@ -42,18 +42,31 @@ public class SeedSlot : MonoBehaviour
         Rigidbody rb = seed.objRigidbody;
 
         seed.transform.SetParent(transform);
+
         seed.transform.localPosition = Vector3.zero;
+
         seed.transform.localRotation = Quaternion.identity;
 
         rb.isKinematic = true;
         rb.useGravity = false;
 
         seed.isPlanted = true;
-        seed.interactable = false;
+
+        //seed.interactable = false;
+
         seed.pickedup = false;
 
         seed.seedPhysicsCollider.enabled = false;
-        seed.pickupTriggerCollider.enabled = false;
+
+        //seed.pickupTriggerCollider.enabled = false;
+
+        // INICIAR CRECIMIENTO AQUÍ
+        PlantGrowth growth = seed.GetComponent<PlantGrowth>();
+
+        if (growth != null)
+        {
+            growth.StartGrowing();
+        }
     }
 }
 

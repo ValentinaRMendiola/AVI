@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 2614133774308109785}
   - component: {fileID: 2963431875530254078}
   - component: {fileID: 2266238337184857936}
-  - component: {fileID: 4749434656433959756}
   - component: {fileID: 1586246827069210250}
   - component: {fileID: 4026830161394503569}
   m_Layer: 0
@@ -109,27 +108,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4432124805086160128, guid: 2b99fa1da8488584ebbc8ea901c1f79e, type: 3}
---- !u!65 &4749434656433959756
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8867234629156357750}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.5, y: 1.5, z: 1.5}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1586246827069210250
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -169,11 +147,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76dc8b11cc8ffed41bcd58a55576fda4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crosshair1: {fileID: 0}
-  crosshair2: {fileID: 0}
-  objTransform: {fileID: 3303404880880748179}
-  cameraTrans: {fileID: 0}
-  interactable: 0
   pickedup: 0
+  isSeed: 0
+  isPlanted: 0
+  seedPhysicsCollider: {fileID: 0}
   objRigidbody: {fileID: 1586246827069210250}
   throwAmount: 0
+  isSeedSource: 0
+  maxSeeds: 5

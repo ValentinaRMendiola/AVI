@@ -58,9 +58,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5866374748233748681}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3272563035919199109}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
       insertIndex: -1
@@ -69,37 +66,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 4595452547431629376}
   m_SourcePrefab: {fileID: 100100000, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
---- !u!4 &8080604230332379415 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
-  m_PrefabInstance: {fileID: 8624019183787022076}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8894541165568371629 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b58c11b87f85e144aeaa25c638a21f3, type: 3}
   m_PrefabInstance: {fileID: 8624019183787022076}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &5866374748233748681
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8894541165568371629}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3272563035919199109
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -160,11 +131,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76dc8b11cc8ffed41bcd58a55576fda4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crosshair1: {fileID: 0}
-  crosshair2: {fileID: 0}
-  objTransform: {fileID: 8080604230332379415}
-  cameraTrans: {fileID: 0}
-  interactable: 0
   pickedup: 0
+  isSeed: 0
+  isPlanted: 0
+  seedPhysicsCollider: {fileID: 0}
   objRigidbody: {fileID: 3272563035919199109}
   throwAmount: 0
+  isSeedSource: 0
+  maxSeeds: 5
