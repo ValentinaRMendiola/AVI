@@ -2,83 +2,77 @@ using UnityEngine;
 
 public class objPickup : MonoBehaviour
 {
-    public GameObject crosshair1, crosshair2;
-    public Transform objTransform, cameraTrans;
-    public bool interactable, pickedup;
+    [HideInInspector]
+    public bool pickedup;
+
+    [Header("Seed Settings")]
+
+    public bool isSeed;
+
+    public bool isPlanted;
+
+    public Collider seedPhysicsCollider;
+
     public Rigidbody objRigidbody;
-    public float throwAmount;
 
-    private void OnTriggerStay(Collider other)
+    public float throwAmount = 8;
+
+    [Header("Seed Duplication")]
+
+    public bool isSeedSource;
+
+    public int maxSeeds = 5;
+
+    private int currentSeeds = 1;
+
+    public void PickUp()
     {
-        if (other.CompareTag("MainCamera"))
-        {
-            crosshair1.SetActive(false);
-            crosshair2.SetActive(true);
-            interactable = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("MainCamera") && !pickedup)
-        {
-            crosshair1.SetActive(true);
-            crosshair2.SetActive(false);
-            interactable = false;
-        }
-    }
-
-    void Update()
-    {
-        if (!interactable) return;
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            PickUp();
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            Drop();
-        }
-
-        if (pickedup && Input.GetMouseButtonDown(1))
-        {
-            Throw();
-        }
-    }
-
-    void PickUp()
-    {
-        objTransform.parent = cameraTrans;
-
-        objRigidbody.isKinematic = true;
-        objRigidbody.useGravity = false;
-        objRigidbody.velocity = Vector3.zero;
-        objRigidbody.angularVelocity = Vector3.zero;
-
         pickedup = true;
+
+        objRigidbody.useGravity = false;
+
+        objRigidbody.drag = 10f;
     }
 
-    void Drop()
+    public void Drop()
     {
-        objTransform.parent = null;
+        pickedup = false;
 
-        objRigidbody.isKinematic = false;
         objRigidbody.useGravity = true;
 
-        pickedup = false;
+        objRigidbody.drag = 0f;
     }
 
-    void Throw()
+    public void Throw(Vector3 dir)
     {
-        objTransform.parent = null;
+        Drop();
 
-        objRigidbody.isKinematic = false;
-        objRigidbody.useGravity = true;
+        objRigidbody.velocity = dir * throwAmount;
+    }
 
-        objRigidbody.velocity = cameraTrans.forward * throwAmount;
+    public objPickup CreateSeedCopy()
+    {
+        GameObject clone = Instantiate(
+            gameObject,
+            transform.position,
+            transform.rotation
+        );
 
-        pickedup = false;
+        objPickup seed = clone.GetComponent<objPickup>();
+
+        seed.isSeedSource = false;
+
+        currentSeeds++;
+
+        seed.currentSeeds = currentSeeds;
+
+        return seed;
+    }
+
+    public bool CanCreateSeed()
+    {
+        return isSeed &&
+               isSeedSource &&
+               currentSeeds < maxSeeds;
     }
 }
